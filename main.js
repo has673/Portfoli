@@ -35,14 +35,20 @@ pointLight.position.set(5, 5, 5);
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(pointLight, ambientLight);
 
+const spotLight = new THREE.SpotLight(0xffffff);
+spotLight.position.set(-10, 10, 10);
+scene.add(spotLight);
+
 // Helpers
 
-// const lightHelper = new THREE.PointLightHelper(pointLight)
+// Uncomment the helpers if needed for debugging
+// const lightHelper = new THREE.PointLightHelper(pointLight);
 // const gridHelper = new THREE.GridHelper(200, 50);
-// scene.add(lightHelper, gridHelper)
+// scene.add(lightHelper, gridHelper);
 
-// const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
+// Function to add stars randomly in the scene
 function addStar() {
   const geometry = new THREE.SphereGeometry(0.25, 24, 24);
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
@@ -66,14 +72,14 @@ scene.background = spaceTexture;
 // Avatar
 
 const jeffTexture = new THREE.TextureLoader().load('jeff.jpeg');
-
 const jeff = new THREE.Mesh(
-  new THREE.PlaneGeometry(3, 3),
+  new THREE.BoxGeometry(15, 10, 6),
   new THREE.MeshBasicMaterial({ map: jeffTexture })
 );
 
-jeff.position.set(0, 0, 0); // Position the plane geometry as needed
+jeff.position.set(20, 0, -5);
 scene.add(jeff);
+
 // Moon
 
 const moonTexture = new THREE.TextureLoader().load('moon.jpg');
@@ -87,13 +93,13 @@ const moon = new THREE.Mesh(
   })
 );
 
+moon.position.set(-10, 0, 30);
 scene.add(moon);
 
-moon.position.z = 30;
-moon.position.setX(-10);
-
-jeff.position.z = -5;
-jeff.position.x = 2;
+// Add a spotlight to enhance moon lighting
+const moonLight = new THREE.PointLight(0xffffff, 1, 100);
+moonLight.position.set(-10, 0, 25);
+scene.add(moonLight);
 
 // Scroll Animation
 
@@ -106,8 +112,8 @@ function moveCamera() {
   jeff.rotation.y += 0.01;
   jeff.rotation.z += 0.01;
 
-  camera.position.z = t * -0.01;
-  camera.position.x = t * -0.0002;
+  camera.position.z = 30 + t * -0.01;
+  camera.position.x = -3 + t * -0.0002;
   camera.rotation.y = t * -0.0002;
 }
 
@@ -119,13 +125,28 @@ moveCamera();
 function animate() {
   requestAnimationFrame(animate);
 
+  // Rotate the torus
   torus.rotation.x += 0.01;
   torus.rotation.y += 0.005;
   torus.rotation.z += 0.01;
 
+  // Rotate the moon
   moon.rotation.x += 0.005;
 
-  // controls.update();
+  // Rotate the stars
+  scene.children.forEach((child) => {
+    if (child.geometry instanceof THREE.SphereGeometry && child !== moon) {
+      child.rotation.x += 0.001;
+      child.rotation.y += 0.001;
+    }
+  });
+
+  // Change background color over time
+  const time = Date.now() * 0.0005;
+  scene.background = new THREE.Color(`hsl(${(time * 10) % 360}, 50%, 50%)`);
+
+  // Update controls
+  controls.update();
 
   renderer.render(scene, camera);
 }
