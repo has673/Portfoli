@@ -71,7 +71,7 @@ scene.background = spaceTexture;
 
 // Avatar
 
-const jeffTexture = new THREE.TextureLoader().load('dist/assets/jeff.jpeg');
+const jeffTexture = new THREE.TextureLoader().load('assets/jeff.jpeg');
 const jeff = new THREE.Mesh(
   new THREE.BoxGeometry(15, 10, 6),
   new THREE.MeshBasicMaterial({ map: jeffTexture })
